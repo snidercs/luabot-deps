@@ -1,0 +1,6 @@
+/linuxathena
+/luario
+/src/**/*.zip
+/work
+/dist
+/src/luajit/
