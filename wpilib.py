@@ -1,11 +1,13 @@
-import os, shutil, subprocess, zipfile
-from artifactory import ArtifactoryPath
-from os.path import expanduser, join
+#!/usr/bin/env python3
 
-# Version of wpilib to assemble for
-WPILIB_VERSION = '2025.2.1'
-# The FRC year
-WPILIB_YEAR = WPILIB_VERSION.split()[0]
+# Attempts to download and assemble maven artifacts for use in traditional
+# development environments.
+
+import os, shutil, subprocess, stat, zipfile
+from artifactory import ArtifactoryPath
+from os.path import join
+
+from deps import unzip, WPILIB_VERSION, BASEDIR, SRCDIR, WORKDIR, LIBDIR, INCDIR
 
 # Package list to download and extract.
 PACKAGES = '''
@@ -21,21 +23,10 @@ PACKAGES = '''
     wpiutil
 '''.split()
 
-WPILIBDIR = expanduser ('~/wpilib/%s/' % (WPILIB_YEAR))
-LUABOTDIR = join (WPILIBDIR, 'luabot')
-BASEDIR   = os.path.dirname (os.path.realpath(__file__))
-
-SRCDIR  = join (BASEDIR, 'src')
-WORKDIR = join (BASEDIR, 'work')
-LIBDIR  = join (BASEDIR, 'dist', 'lib')
-INCDIR  = join (BASEDIR, 'dist', 'include')
-
 BASEURL_WPI = 'https://frcmaven.wpi.edu/ui/native/wpilib-mvn-release/edu/wpi/first'
-BASEURL_LUABOT = BASEURL_WPI
-BASEURL = BASEURL_LUABOT
 
 def baseurl (name):
-    return '%s/%s/%s-cpp/%s' % (BASEURL, name, name, WPILIB_VERSION)
+    return '%s/%s/%s-cpp/%s' % (BASEURL_WPI, name, name, WPILIB_VERSION)
 
 def headers_filename (name):
     return '%s-cpp-%s-headers.zip' % (name, WPILIB_VERSION)
@@ -94,20 +85,6 @@ def download():
     for name in PACKAGES:
         download_package (name)
 
-def unzip (file, destdir):
-    try:
-        with zipfile.ZipFile(file, 'r') as zip_ref:
-            zip_ref.extractall(destdir)
-        print (f"Extracted '{file}' to '{destdir}'")
-    except FileNotFoundError:
-         print (f"Error: file '{file}' not found.")
-    except zipfile.BadZipFile:
-        print (f"Error: '{file}' is not a valid archive.")
-    except Exception as e:
-        print (f"Error: Exception: {e}")
-
-import stat
-
 def extract_libs (name):
     zipfile = join (SRCDIR, libs_filename (name))
     outpath = join (WORKDIR, name)
@@ -133,9 +110,12 @@ def extract():
     for name in PACKAGES:
         extract_package (name)
 
-if __name__ == "__main__":
+def assemble():
     os.chdir (BASEDIR)
     download()
-    extract()    
+    extract()
     subprocess.call ([ 'sh', join (BASEDIR, 'luajit.sh') ])
+
+if __name__ == "__main__":
+    assemble()
     exit (0)

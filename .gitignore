@@ -4,3 +4,5 @@
 /work
 /dist
 /src/luajit/
+
+__pycache__
