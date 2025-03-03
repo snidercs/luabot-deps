@@ -1,8 +1,13 @@
 #!/usr/bin/sh
 
+# This installer is temporary: it installs the 'dist' folder
+# to ~/wpilib/$FRC_YEAR/luabot. See also: meson.build
+# WARNING: this script is destructive, the prefix directory will be
+# wiped out completely.
+
 prefix="$1"
 if [ -z "$1" ];then
-    prefix="${HOME}/wpilib/2025/luabot/linuxathena"
+    prefix="${HOME}/wpilib/2025/luabot"
 fi
 
 mkdir -p "${prefix}"

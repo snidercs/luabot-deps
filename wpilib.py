@@ -3,11 +3,11 @@
 # Attempts to download and assemble maven artifacts for use in traditional
 # development environments.
 
-import os, shutil, subprocess, stat, zipfile
+import os, shutil, subprocess, stat
 from artifactory import ArtifactoryPath
 from os.path import join
 
-from deps import unzip, WPILIB_VERSION, BASEDIR, SRCDIR, WORKDIR, LIBDIR, INCDIR
+from deps import unzip, downloaded, WPILIB_VERSION, BASEDIR, SRCDIR, WORKDIR, LIBDIR, INCDIR
 
 # Package list to download and extract.
 PACKAGES = '''
@@ -37,53 +37,25 @@ def headers_url (name):
 def libs_filename (name, system='linuxathena'):
     return '%s-cpp-%s-%s.zip' % (name, WPILIB_VERSION, system)
 
-def libs_url (name):
-    return baseurl(name) + '/%s' % libs_filename (name)
+def libs_url (name, system):
+    return baseurl(name) + '/%s' % libs_filename (name, system)
 
-def downloaded (name):
-    f1 = join (SRCDIR, libs_filename (name))
-    f2 = join (SRCDIR, headers_filename (name))
-    return os.path.exists (f1) and os.path.exists (f2)
-
-def download_package (name):
-    if downloaded (name):
-        return
-    
-    packages = [{
-        'filename': libs_filename (name),
-        'url': libs_url(name),
-    },
-    {
-        'filename': headers_filename (name),
-        'url': headers_url (name)
-    }]
-    
-    for pkg in packages:
-        print (pkg['url'])
-        continue
-        path = ArtifactoryPath(pkg['url'])
-        outfile = join (SRCDIR, pkg['filename'])
-        try:
-            with path.open() as fd, open (outfile, "wb") as out:
-                out.write (fd.read())
-            print(f"File downloaded successfully to {outfile}")
-        except Exception as e:
-            print(f"Error downloading file: {e}")
-
-def download():
-    if not os.path.exists (BASEDIR):
-        os.makedirs (BASEDIR, 511, True)
-    
-    for dir in [ WORKDIR, INCDIR, LIBDIR ]:
-        if os.path.exists(dir):
-            shutil.rmtree (dir)
-    os.makedirs (dir, 511, True)
-    
-    if not os.path.exists (SRCDIR):
-        os.mkdir (SRCDIR)
-    
+def render_download_links():
     for name in PACKAGES:
-        download_package (name)
+        packages = [{
+            'filename': headers_filename (name),
+            'url': headers_url (name)
+        }]
+        
+        for system in 'linuxx86-64 linuxathena'.split():
+            packages.append ({
+                'filename': libs_filename (name, system),
+                'url': libs_url(name, system),
+            })
+        
+        for pkg in packages:
+            print (pkg['url'])
+            continue
 
 def extract_libs (name):
     zipfile = join (SRCDIR, libs_filename (name))
@@ -105,17 +77,7 @@ def extract_headers (name):
 def extract_package (name):
     extract_headers (name)
     extract_libs (name)
-
-def extract():
-    for name in PACKAGES:
-        extract_package (name)
-
-def assemble():
-    os.chdir (BASEDIR)
-    download()
-    extract()
-    subprocess.call ([ 'sh', join (BASEDIR, 'luajit.sh') ])
-
+    
 if __name__ == "__main__":
-    assemble()
-    exit (0)
+    render_download_links()
+    exit(0)

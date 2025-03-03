@@ -9,7 +9,7 @@ ljbld="${here}/work/luajit"
 prefix="$1"
 
 if [ -z "$1" ]; then
-    prefix="${here}/dist"
+    prefix="${here}/dist/lib/linuxathena"
 fi
 
 set -ex

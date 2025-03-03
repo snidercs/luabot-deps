@@ -1,4 +1,4 @@
-# LuaBOT - WPILib
+# LuaBot Deps
 This project contains utilities that assemble official wpilib libraries and headers needed to target the roborio.  These artifacts, after running `install.sh`, get placed in the same base path to an installed WPIlib. e.g. Artifiacts go here: `$HOME/wpilib/2025/luabot/**/*`
 
 **Experimental**: if using this project as a meson subproject, then running the install script is not necessary.
@@ -6,11 +6,14 @@ This project contains utilities that assemble official wpilib libraries and head
 **LuaJIT**: As an aside, this project also builds lua jit targeting the rio. TODO: move to it's own project.
 ds
 
-## Install It
+## Build It
+```bash
+# TODO
 ```
-meson setup build
-ninja -C build
-sh install.sh
+
+## Install It
+```bash
+# TODO:
 ```
 
 ## Cmake and Meson Toolchains

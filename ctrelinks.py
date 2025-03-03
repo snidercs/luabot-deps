@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
+
+# Right now all this file does is echo a shell script that wget's
+# the required maven artifacts from CTRE.
 
 BASEURL = 'https://maven.ctr-electronics.com/release'
 
 import deps, json
-from pprint import pprint
 
 class MavenArtifact (deps.Artifact):
     def __init__(self, dep):
@@ -55,12 +58,23 @@ def main():
         print("Error reading json")
         return -1
     
+    print ('''
+#!/usr/bin/sh
+# This file is auto generated: do not modify directly
+    
+set -e
+    '''.strip())
+    print()
     for d in [ MavenArtifact (dep) for dep in data['cppDependencies'] ]:
         if d.hasHeaders():
-            print (d.headersURL())
+            print ('wget ' + d.headersURL())
         # for u in d.libraryURLs():
         #     print (u)
-        print (d.libraryURL())
+        print ('wget ' + d.libraryURL())
+        if (d.supportedOn ('linuxathena')):
+            print ('wget ' + d.libraryURL ('linuxathena'))
+    print()
+    print('exit 0')
     return 0
 
 if __name__ == "__main__":
