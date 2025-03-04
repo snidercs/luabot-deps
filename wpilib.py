@@ -24,6 +24,7 @@ PACKAGES = '''
 '''.split()
 
 BASEURL_WPI = 'https://frcmaven.wpi.edu/ui/native/wpilib-mvn-release/edu/wpi/first'
+BASEURL_CLOUDFRONT = 'https://d38c02sf6d6ar3.cloudfront.net'
 
 def baseurl (name):
     return '%s/%s/%s-cpp/%s' % (BASEURL_WPI, name, name, WPILIB_VERSION)
@@ -47,7 +48,7 @@ def render_download_links():
             'url': headers_url (name)
         }]
         
-        for system in 'linuxx86-64 linuxathena'.split():
+        for system in 'linuxx86-64 linuxathena windowsx86-64 osxuniversal'.split():
             packages.append ({
                 'filename': libs_filename (name, system),
                 'url': libs_url(name, system),
@@ -56,6 +57,18 @@ def render_download_links():
         for pkg in packages:
             print (pkg['url'])
             continue
+
+def render_download_script():
+    print ("#!/usr/bin/sh")
+    print ("# This script is auto-generated. Do not modify directly.")
+    print('''
+set -e
+''')
+    for name in PACKAGES:
+        print ('wget %s/%s' % (BASEURL_CLOUDFRONT, headers_filename (name)))
+        for system in 'linuxx86-64 linuxathena'.split():
+            print ('wget %s/%s' % (BASEURL_CLOUDFRONT, libs_filename (name, system)))
+    print()
 
 def extract_libs (name):
     zipfile = join (SRCDIR, libs_filename (name))
@@ -79,5 +92,5 @@ def extract_package (name):
     extract_libs (name)
     
 if __name__ == "__main__":
-    render_download_links()
+    render_download_script()
     exit(0)
