@@ -3,6 +3,9 @@
 
 set -e
 
+wget https://d38c02sf6d6ar3.cloudfront.net/halsim_gui-2025.2.1-headers.zip
+wget https://d38c02sf6d6ar3.cloudfront.net/halsim_gui-2025.2.1-linuxx86-64.zip   
+
 wget https://d38c02sf6d6ar3.cloudfront.net/apriltag-cpp-2025.2.1-headers.zip
 wget https://d38c02sf6d6ar3.cloudfront.net/apriltag-cpp-2025.2.1-linuxx86-64.zip
 wget https://d38c02sf6d6ar3.cloudfront.net/apriltag-cpp-2025.2.1-linuxathena.zip

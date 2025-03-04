@@ -63,6 +63,9 @@ def render_download_script():
     print ("# This script is auto-generated. Do not modify directly.")
     print('''
 set -e
+
+wget https://d38c02sf6d6ar3.cloudfront.net/halsim_gui-2025.2.1-headers.zip
+wget https://d38c02sf6d6ar3.cloudfront.net/halsim_gui-2025.2.1-linuxx86-64.zip   
 ''')
     for name in PACKAGES:
         print ('wget %s/%s' % (BASEURL_CLOUDFRONT, headers_filename (name)))
